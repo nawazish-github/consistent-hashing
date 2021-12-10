@@ -14,3 +14,7 @@ func (sa *ServerAllocation) AllocateServer(serverKey string) {
 	loc := hash.LocationOnRing(serverKey)
 	sa.serverLocations[loc] = serverKey
 }
+
+func (sa *ServerAllocation) FindTheServer(reqKey string) {
+
+}
