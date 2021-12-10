@@ -36,6 +36,7 @@ func (sa *ServerAllocation) walk(loc int64, reqKey string) string {
 
 	for k, _ := range sa.serverLocations {
 		sortedKeys = append(sortedKeys, k)
+		fmt.Println(sortedKeys)
 	}
 	return ""
 }
