@@ -14,13 +14,13 @@ func hash(key string) *big.Int {
 	hash := bi.SetBytes(h.Sum(nil))
 	return hash
 }
-func mod(num *big.Int) int64 {
+func mod(num *big.Int) int {
 	res := big.NewInt(0)
 	mod := big.NewInt(OutputSpace)
 	res.Mod(num, mod)
-	return res.Int64()
+	return int(res.Int64())
 }
-func LocationOnRing(key string) int64 {
+func LocationOnRing(key string) int {
 	hash := hash(key)
 	return mod(hash)
 }
