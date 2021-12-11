@@ -2,16 +2,17 @@ package server_allocations
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/nawazish-github/consistent-hashing/hash"
 )
 
 type ServerAllocation struct {
-	serverLocations map[int64]string
+	serverLocations map[int]string
 }
 
 func (sa *ServerAllocation) InitServerAllocation() {
-	sa.serverLocations = make(map[int64]string)
+	sa.serverLocations = make(map[int]string)
 }
 
 func (sa *ServerAllocation) AllocateServer(serverKey string) {
@@ -28,15 +29,19 @@ func (sa *ServerAllocation) FindTheServer(reqKey string) {
 	}
 }
 
-func (sa *ServerAllocation) walk(loc int64, reqKey string) string {
-
-	//15, 30, 45, 60, 67, 88, 90 | 58
-
-	sortedKeys := make([]int64, len(sa.serverLocations))
+func (sa *ServerAllocation) walk(loc int, reqKey string) string {
+	sortedKeys := make([]int, len(sa.serverLocations))
 
 	for k, _ := range sa.serverLocations {
 		sortedKeys = append(sortedKeys, k)
-		fmt.Println(sortedKeys)
+		sortedKeys = sort.IntSlice(sortedKeys)
+	}
+
+	for i, serLoc := range sortedKeys {
+		if serLoc > loc {
+			fmt.Printf("Request %s would be served on Server %s", sa.serverLocations[i], reqKey)
+			return sa.serverLocations[i-1]
+		}
 	}
 	return ""
 }
