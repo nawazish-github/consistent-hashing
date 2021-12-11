@@ -15,9 +15,10 @@ func (sa *ServerAllocation) InitServerAllocation() {
 	sa.serverLocations = make(map[int]string)
 }
 
-func (sa *ServerAllocation) AllocateServer(serverKey string) {
+func (sa *ServerAllocation) AllocateServer(serverKey string) int {
 	loc := hash.LocationOnRing(serverKey)
 	sa.serverLocations[loc] = serverKey
+	return loc
 }
 
 func (sa *ServerAllocation) FindTheServer(reqKey string) {
@@ -43,5 +44,5 @@ func (sa *ServerAllocation) walk(loc int, reqKey string) string {
 			return sa.serverLocations[i-1]
 		}
 	}
-	return ""
+	panic(`no server available to serve request #{reqKey}`)
 }
