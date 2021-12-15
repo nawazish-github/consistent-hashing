@@ -42,13 +42,14 @@ func (sa *ServerAllocation) walk(loc int, reqKey string) string {
 		sortedKeys = append(sortedKeys, k)
 	}
 
-	sortedKeys = sort.IntSlice(sortedKeys)
+	//sortedKeys = sort.IntSlice(sortedKeys)
+	sort.Ints(sortedKeys)
 
-	for i := loc; ; {
+	for i := 97; ; {
 		for j := 0; j < len(sortedKeys); j++ {
 			if i <= sortedKeys[j] {
 				fmt.Printf("Request %s would be served on server %s", reqKey, sa.serverLocations[sortedKeys[j]])
-				return sa.serverLocations[i]
+				return sa.serverLocations[sortedKeys[j]]
 			}
 		}
 

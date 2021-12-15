@@ -1,7 +1,6 @@
 package server_allocations
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -36,8 +35,22 @@ var _ = Describe("Server tests", func() {
 				serverAlloc.AllocateServer(serverKey)
 				requestKey := "get me coffee"
 				server := serverAlloc.FindTheServer(requestKey)
-				fmt.Println("SERVER BABA: ", server)
 				Expect(server).Should(Equal("com.server"))
+			})
+		})
+
+		When("A request key is provided and its hash falls between two servers on the cluster", func() {
+			It("Should route the request to the available server", func() {
+				serverKeyOne := "com.server.one"
+				serverAlloc.AllocateServer(serverKeyOne)
+
+				serverKeyThree := "com.server.three"
+				serverAlloc.AllocateServer(serverKeyThree)
+
+				requestKey := "get me coffee"
+				server := serverAlloc.FindTheServer(requestKey)
+
+				Expect(server).Should(Equal("com.server.three"))
 			})
 		})
 	})
