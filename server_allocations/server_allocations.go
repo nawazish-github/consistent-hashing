@@ -21,28 +21,53 @@ func (sa *ServerAllocation) AllocateServer(serverKey string) int {
 	return loc
 }
 
-func (sa *ServerAllocation) FindTheServer(reqKey string) {
+func (sa *ServerAllocation) FindTheServer(reqKey string) string {
 	loc := hash.LocationOnRing(reqKey)
 	if server, ok := sa.serverLocations[loc]; ok {
 		fmt.Printf("Request %s is served by server %s", reqKey, server)
+		return server
 	} else {
-		sa.walk(loc, reqKey)
+		return sa.walk(loc, reqKey)
 	}
 }
 
 func (sa *ServerAllocation) walk(loc int, reqKey string) string {
-	sortedKeys := make([]int, len(sa.serverLocations))
+	if len(sa.serverLocations) == 0 {
+		panic("no server available on cluster to process request")
+	}
 
-	for k, _ := range sa.serverLocations {
+	var sortedKeys []int
+
+	for k := range sa.serverLocations {
 		sortedKeys = append(sortedKeys, k)
-		sortedKeys = sort.IntSlice(sortedKeys)
 	}
 
-	for i, serLoc := range sortedKeys {
-		if serLoc > loc {
-			fmt.Printf("Request %s would be served on Server %s", sa.serverLocations[i], reqKey)
-			return sa.serverLocations[i-1]
+	sortedKeys = sort.IntSlice(sortedKeys)
+
+	for i := loc; ; {
+		for j := 0; j < len(sortedKeys); j++ {
+			if i <= sortedKeys[j] {
+				fmt.Printf("Request %s would be served on server %s", reqKey, sa.serverLocations[sortedKeys[j]])
+				return sa.serverLocations[i]
+			}
 		}
+
+		//reset the loop counter as soon it exhausts the output space
+		//so that a server is searched on locations behind hashed value
+		//of the request on the hash ring
+		if i == hash.OutputSpace {
+			i = 0
+			continue
+		}
+
+		//if the loop counter has searched the entire output space
+		//and yet no server was assigned to the request, it would
+		//mean there is no server on the cluster, panic out
+		if i == loc-1 {
+			panic(`no server available to serve request #{reqKey}`)
+		}
+
+		i++
 	}
-	panic(`no server available to serve request #{reqKey}`)
+
 }
