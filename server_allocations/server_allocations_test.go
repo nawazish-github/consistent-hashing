@@ -30,7 +30,7 @@ var _ = Describe("Server tests", func() {
 	})
 
 	Context("Attempt to find a server", func() {
-		When("A request key is provided and atleast one server is available on the cluster", func() {
+		When("A request key is provided and at max one server is available on the cluster", func() {
 			It("Should route the request to the available server", func() {
 				serverKey := "com.server"
 				serverAlloc.AllocateServer(serverKey)
