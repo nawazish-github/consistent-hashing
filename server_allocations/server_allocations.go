@@ -21,10 +21,22 @@ func (sa *ServerAllocation) AllocateServer(serverKey string) int {
 	return loc
 }
 
+func (sa *ServerAllocation) DeallocateServer(loc int) bool {
+	server, ok := sa.serverLocations[loc]
+	if ok {
+		delete(sa.serverLocations, loc)
+		fmt.Printf("Server removed from cluster: %s \n", server)
+		return true
+	}
+
+	fmt.Printf("no server found on the loc %d to remove \n", loc)
+	return false
+}
+
 func (sa *ServerAllocation) FindTheServer(reqKey string) string {
 	loc := hash.LocationOnRing(reqKey)
 	if server, ok := sa.serverLocations[loc]; ok {
-		fmt.Printf("Request %s is served by server %s", reqKey, server)
+		fmt.Printf("Request %s is served by server %s \n", reqKey, server)
 		return server
 	} else {
 		return sa.walk(loc, reqKey)
@@ -45,10 +57,10 @@ func (sa *ServerAllocation) walk(loc int, reqKey string) string {
 	//sortedKeys = sort.IntSlice(sortedKeys)
 	sort.Ints(sortedKeys)
 
-	for i := 97; ; {
+	for i := loc; ; {
 		for j := 0; j < len(sortedKeys); j++ {
 			if i <= sortedKeys[j] {
-				fmt.Printf("Request %s would be served on server %s", reqKey, sa.serverLocations[sortedKeys[j]])
+				fmt.Printf("Request [%s] would be served on server [%s] \n", reqKey, sa.serverLocations[sortedKeys[j]])
 				return sa.serverLocations[sortedKeys[j]]
 			}
 		}

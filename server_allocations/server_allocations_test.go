@@ -53,5 +53,25 @@ var _ = Describe("Server tests", func() {
 				Expect(server).Should(Equal("com.server.three"))
 			})
 		})
+
+		When("The server scheduled for serving a particular request goes down", func() {
+			It("Should schedule the request to the next available server", func() {
+				servers := []string{"com.server.one", "com.server.four", "com.server.five"}
+
+				for _, server := range servers {
+					serverAlloc.AllocateServer(server)
+				}
+
+				requestKey := "get me coffee"
+				server := serverAlloc.FindTheServer(requestKey)
+
+				Expect(server).Should(Equal("com.server.four"))
+
+				serverAlloc.DeallocateServer(86) //86 corresponds to server "com.server.four"
+
+				server = serverAlloc.FindTheServer(requestKey)
+				Expect(server).Should(Equal("com.server.five"))
+			})
+		})
 	})
 })
